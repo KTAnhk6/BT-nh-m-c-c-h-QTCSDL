@@ -2,7 +2,6 @@
 ----------------------------------------------------------------------
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'QuanLyBenhVien')
 BEGIN
-    -- SỬA LỖI: Thêm COLLATE vào đây để thiết lập Collation ngay khi tạo Database
     CREATE DATABASE QuanLyBenhVien COLLATE Vietnamese_CI_AS;
 END
 GO
@@ -77,99 +76,6 @@ CREATE TABLE LichTruc (
     FOREIGN KEY (MaBS) REFERENCES BacSi(MaBS)
 );
 GO
-
--- Bước 4: CHÈN DỮ LIỆU TỔNG HỢP (DML)
-----------------------------------------------------------------------
-
-INSERT INTO PHONG (MaPhong, TenPhong, ChuyenKhoa) VALUES
-('P01', N'Phòng khám Tim Mạch', N'Tim mạch'),
-('P02', N'Phòng khám Nhi', N'Nhi khoa'),
-('P03', N'Phòng khám Da Liễu', N'Da liễu'),
-('P04', N'Phòng Nội tổng hợp', N'Nội khoa'),
-('P05', N'Phòng Ngoại tổng hợp', N'Ngoại khoa');
-GO
-
--- Bước 4.1: CHÈN DỮ LIỆU BÁC SĨ (Đảm bảo mỗi khoa chỉ có 2 người)
-----------------------------------------------------------------------
-PRINT N'--- CHÈN DỮ LIỆU BÁC SĨ (MỖI KHOA 2 NGƯỜI) ---';
-
--- Tim mạch (BS001, BS004)
-INSERT INTO BacSi (MaBS, HoTen, GioiTinh, DiaChi, ChuyenKhoa) VALUES
-('BS001', N'Nguyễn Văn An', N'Nam', N'123 Đường A, Hà Nội', N'Tim mạch'),
-('BS004', N'Phạm Thu Dung', N'Nữ', N'101 Phố D, Hà Nội', N'Tim mạch');
-
--- Nhi khoa (BS002, BS009)
-INSERT INTO BacSi (MaBS, HoTen, GioiTinh, DiaChi, ChuyenKhoa) VALUES
-('BS002', N'Trần Thị Bình', N'Nữ', N'456 Phố B, TP.HCM', N'Nhi khoa'),
-('BS009', N'Đỗ Thị Hương', N'Nữ', N'555 Phố E, Hà Nội', N'Nhi khoa');
-
--- Da liễu (BS003, BS010)
-INSERT INTO BacSi (MaBS, HoTen, GioiTinh, DiaChi, ChuyenKhoa) VALUES
-('BS003', N'Lê Minh Cường', N'Nam', N'789 Đường C, Đà Nẵng', N'Da liễu'),
-('BS010', N'Hoàng Thanh Trúc', N'Nữ', N'222 Phố F, TP.HCM', N'Da liễu');
-
--- Nội khoa (BS005, BS006)
-INSERT INTO BacSi (MaBS, HoTen, GioiTinh, ChuyenKhoa) VALUES
-('BS005', N'Vũ Hải Yến', N'Nữ', N'Nội khoa'),
-('BS006', N'Trần Thị Mai', N'Nữ', N'Nội khoa');
-
--- Ngoại khoa (BS007, BS008)
-INSERT INTO BacSi (MaBS, HoTen, GioiTinh, ChuyenKhoa) VALUES
-('BS007', N'Phạm Văn Cường', N'Nam', N'Ngoại khoa'),
-('BS008', N'Lê Văn Minh', N'Nam', N'Ngoại khoa');
-GO
-
--- Chèn dữ liệu bệnh nhân và các bảng khác
-INSERT INTO BenhNhan (MaBenhNhan, HoTen, NgaySinh, GioiTinh, DiaChi, SoDienThoai) VALUES
-('BN-A001', N'Nguyễn Văn An', '1990-05-15', N'Nam', N'123 Đường Lê Lợi, Quận 1, TP.HCM', '0901234567'),
-('BN-A002', N'Trần Thị Bình', '1985-08-20', N'Nữ', N'456 Đường Nguyễn Huệ, Quận 1, TP.HCM', '0912345678'),
-('BN-A003', N'Lê Văn Cường', '1978-12-10', N'Nam', N'789 Đường Pasteur, Quận 3, TP.HCM', '0923456789'),
-('BN-A004', N'Phạm Thị Dung', '1995-03-25', N'Nữ', N'321 Đường Cách Mạng Tháng 8, Quận 10, TP.HCM', '0934567890'),
-('BN-A005', N'Hoàng Văn Em', '1982-07-30', N'Nam', N'654 Đường 3/2, Quận 10, TP.HCM', '0945678901'),
-('BN-B001', N'Nguyễn Văn A', '1990-01-01', N'Nam', N'TP.HCM', NULL),
-('BN-B002', N'Lê Thị B', '1995-03-02', N'Nữ', N'TP.HCM', NULL),
-('BN-B003', N'Trần Văn C', '1988-05-20', N'Nam', N'TP.HCM', NULL),
-('BN-B004', N'Phạm Thị D', '2000-09-15', N'Nữ', N'TP.HCM', NULL),
-('BN-C001', N'Nguyễn Văn A', '1990-05-12', N'Nam', N'Hà Nội', '0987654321'),
-('BN-C002', N'Nguyễn Thị B', '1991-06-13', N'Nữ', N'Hà Nội', '0983665512'),
-('BN-C003', N'Trần Văn C', '1992-07-14', N'Nam', N'Hà Nội', '0988655321');
-GO
-
--- Cập nhật LichTruc: Chỉ sử dụng các MaBS (BS001, BS004, BS002, BS009, BS003, BS010, BS005, BS007)
-INSERT INTO LichTruc (MaBS, NgayTruc, CaTruc, ChuyenKhoaTruc) VALUES
-('BS001', '2025-11-15', N'Sáng', N'Tim mạch'),
-('BS002', '2025-11-15', N'Chiều', N'Nhi khoa'),
-('BS004', '2025-11-16', N'Tối', N'Tim mạch'),
-('BS003', '2025-11-16', N'Sáng', N'Da liễu'),
-('BS005', '2025-11-17', N'Sáng', N'Nội khoa'),
-('BS007', '2025-11-17', N'Chiều', N'Ngoại khoa'),
-('BS009', '2025-11-18', N'Sáng', N'Nhi khoa'),
-('BS006', '2025-11-18', N'Tối', N'Nội khoa'); -- Đã đổi BS011 sang BS006
-GO
-
--- Cập nhật LichKham: Chỉ sử dụng các MaBS đã chọn
-INSERT INTO LichKham (MaBenhNhan, MaBS, MaPhong, NgayGioKham, TinhTrangKham) VALUES
-('BN-A001', 'BS001', 'P01', '2025-10-01 10:00:00', N'Khám định kỳ'),
-('BN-A002', 'BS001', 'P01', '2025-10-02 11:00:00', N'Kiểm tra HA'),
-('BN-A003', 'BS002', 'P02', '2025-10-01 08:30:00', N'Sốt'),
-('BN-A004', 'BS002', 'P02', '2025-10-01 09:00:00', N'Viêm họng'),
-('BN-A005', 'BS002', 'P02', '2025-10-03 15:00:00', N'Tiêm chủng'),
-('BN-A001', 'BS003', 'P03', '2025-10-05 14:00:00', N'Mụn trứng cá'),
-('BN-A002', 'BS004', 'P01', '2025-11-01 08:00:00', N'Đau ngực'),
-('BN-B001', 'BS005', 'P04', '2025-11-10 09:00:00', N'Lần đầu khám Nội'),
-('BN-B002', 'BS007', 'P05', '2025-11-10 10:30:00', N'Lần đầu khám Ngoại'),
-('BN-B003', 'BS005', 'P04', '2025-11-11 14:00:00', N'Tái khám Nội'),
-('BN-B004', 'BS003', 'P03', '2025-11-11 15:30:00', N'Lần đầu khám Da Liễu'),
-('BN-B001', 'BS006', 'P04', '2025-11-12 08:00:00', N'Theo dõi Nội'),
-('BN-C001', 'BS004', 'P01', '2025-11-20 08:30:00', N'Đã khám Tim Mạch'), -- Đã đổi BS011 sang BS004
-('BN-C002', 'BS009', 'P02', '2025-11-20 09:00:00', N'Chờ khám Nhi'),
-('BN-C003', 'BS003', 'P03', '2025-11-21 10:00:00', N'Đã khám Da Liễu'),
-('BN-C001', 'BS001', 'P01', '2025-11-28 14:00:00', N'Tái khám Tim Mạch'),
-('BN-C002', 'BS002', 'P02', '2025-12-01 09:30:00', N'Điều trị nội trú Nhi');
-GO
-
--- Bước 5: THÊM TRIGGER, VIEW VÀ TRUY VẤN BÁO CÁO TỔNG HỢP
-----------------------------------------------------------------------
 
 -- ⭐ THÊM TRIGGER: Ngăn chặn Xung đột Thời gian Khám cho Bác sĩ ⭐
 PRINT N'--- TRIGGER: Ngăn chặn Xung đột Thời gian Khám cho Bác sĩ ---';
@@ -262,7 +168,7 @@ ORDER BY
     SLK.TongSoBenhNhan DESC;
 GO
 
-PRINT N'--- BÁO CÁO 5: BỆNH NHÂN ĐANG ĐIỀU TRỊ NỘI TRÚ (ĐÃ SỬA) ---';
+PRINT N'--- BÁO CÁO 5: BỆNH NHÂN ĐANG ĐIỀU TRỊ NỘI TRÚ ---';
 
 SELECT
     BN.MaBenhNhan,
@@ -292,8 +198,6 @@ GO
 
 PRINT N'--- KỊCH BẢN SQL TỔNG HỢP ĐÃ HOÀN TẤT THÀNH CÔNG TRONG DATABASE QuanLyBenhVien ---';
 GO
-
--- Đoạn mã SQL cũ kết thúc ở khoảng dòng 228/229
 GO
 
 -- Bước 6: XEM TẤT CẢ DỮ LIỆU GỐC TRONG CÁC BẢNG (KIỂM TRA) 
